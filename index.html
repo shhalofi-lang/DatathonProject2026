@@ -21,9 +21,11 @@
       margin-top: 10px;
       padding: 10px;
       width: 100%;
+      cursor: pointer;
     }
     #status {
       margin-top: 15px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -39,12 +41,15 @@
 </div>
 
 <script>
+  // 🔴 CHANGE THIS TO YOUR CLOUDflare WORKER URL
+  const WORKER_URL = "https://n8n-upload-proxy.afro0o-girl-17d.workers.dev/";
+
   async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const status = document.getElementById("status");
 
     if (!fileInput.files.length) {
-      status.innerText = "Please select a Word document.";
+      status.innerText = "❌ Please select a Word document.";
       return;
     }
 
@@ -52,25 +57,24 @@
     const formData = new FormData();
     formData.append("file", file);
 
-    status.innerText = "Uploading...";
+    status.innerText = "⏳ Uploading...";
 
     try {
-      const response = await fetch(
-        "https://n8n.yourdomain.com/webhook/upload-word",
-        {
-          method: "POST",
-          body: formData
-        }
-      );
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        body: formData
+      });
+
+      const text = await response.text();
 
       if (!response.ok) {
-        throw new Error("Upload failed");
+        throw new Error(text || "Upload failed");
       }
 
-      status.innerText = "File uploaded successfully!";
+      status.innerText = "✅ File uploaded successfully!";
     } catch (error) {
       console.error(error);
-      status.innerText = "Error uploading file.";
+      status.innerText = "❌ Error uploading file.";
     }
   }
 </script>
